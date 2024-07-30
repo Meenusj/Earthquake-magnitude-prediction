@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Earthquake Magnitude Predictor</title>
+    <style>
+        body {
+            background: url('/static/images/background.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            position: relative;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .input-group input[type="range"] {
+            flex: 1;
+            margin-right: 10px;
+            appearance: none;
+            height: 8px;
+            background: #ddd;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            width: 75%;
+        }
+
+        .input-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: red;
+            cursor: pointer;
+        }
+
+        .input-group input[type="range"]::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            background: red;
+            cursor: pointer;
+        }
+
+        .input-group input[type="range"]::-ms-thumb {
+            width: 15px;
+            height: 15px;
+            background: red;
+            cursor: pointer;
+        }
+
+        .input-group input[type="text"] {
+            width: 80px;
+            text-align: center;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 5px;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+
+        label {
+            color: white;
+        }
+
+        .btn {
+            background-color: red;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Earthquake Magnitude Predictor</h1>
+        <form action="/predict" method="post" class="needs-validation" novalidate>
+            <div class="form-group">
+                <label for="latitude">Latitude:</label>
+                <div class="input-group">
+                    <input type="range" class="form-control custom-range" id="latitude_range" name="latitude" min="-65.8497" max="86.5939" value="0" step="0.01">
+                    <input type="text" class="custom-text" id="latitude_text" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="longitude">Longitude:</label>
+                <div class="input-group">
+                    <input type="range" class="form-control custom-range" id="longitude_range" name="longitude" min="-179.9987" max="179.9994" value="0" step="0.01">
+                    <input type="text" class="custom-text" id="longitude_text" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="depth">Depth (km):</label>
+                <div class="input-group">
+                    <input type="range" class="form-control custom-range" id="depth_range" name="depth" min="-3.37" max="681.238" value="0" step="1">
+                    <input type="text" class="custom-text" id="depth_text" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="horizontalError">Horizontal Error:</label>
+                <div class="input-group">
+                    <input type="range" class="form-control custom-range" id="horizontalError_range" name="horizontalError" min="0.0" max="99.0" value="0" step="0.1">
+                    <input type="text" class="custom-text" id="horizontalError_text" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="depthError">Depth Error:</label>
+                <div class="input-group">
+                    <input type="range" class="form-control custom-range" id="depthError_range" name="depthError" min="0.0" max="60.67" value="0" step="0.1">
+                    <input type="text" class="custom-text" id="depthError_text" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="magError">Magnitude Error:</label>
+                <div class="input-group">
+                    <input type="range" class="form-control custom-range" id="magError_range" name="magError" min="0.0" max="4.49" value="0" step="0.01">
+                    <input type="text" class="custom-text" id="magError_text" value="0">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Predict Magnitude</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function syncRangeWithText(rangeId, textId) {
+            const range = document.getElementById(rangeId);
+            const text = document.getElementById(textId);
+
+            range.addEventListener('input', () => {
+                text.value = range.value;
+            });
+
+            text.addEventListener('input', () => {
+                if (!isNaN(text.value)) {
+                    range.value = text.value;
+                }
+            });
+        }
+
+        syncRangeWithText('latitude_range', 'latitude_text');
+        syncRangeWithText('longitude_range', 'longitude_text');
+        syncRangeWithText('depth_range', 'depth_text');
+        syncRangeWithText('horizontalError_range', 'horizontalError_text');
+        syncRangeWithText('depthError_range', 'depthError_text');
+        syncRangeWithText('magError_range', 'magError_text');
+    </script>
+</body>
+</html>

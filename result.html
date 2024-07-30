@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Prediction Result</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Prediction Result</h1>
+        <div class="alert alert-primary" role="alert">
+            {% if prediction %}
+                {% if prediction <= 4.0 %}
+                    <p class="alert alert-success">The predicted earthquake magnitude is: <strong>{{ prediction }}</strong>. This is considered a low magnitude.</p>
+                {% elif prediction <= 6.0 %}
+                    <p class="alert alert-warning">The predicted earthquake magnitude is: <strong>{{ prediction }}</strong>. This is considered a moderate magnitude.</p>
+                {% else %}
+                    <p class="alert alert-danger">Warning: The predicted earthquake magnitude is: <strong>{{ prediction }}</strong>. This is considered a high magnitude!</p>
+                {% endif %}
+            {% elif error %}
+                <p>Error: <strong>{{ error }}</strong></p>
+            {% endif %}
+        </div>
+        <a href="/" class="btn btn-info btn-block">Predict another magnitude</a>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
